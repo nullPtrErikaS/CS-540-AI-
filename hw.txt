@@ -1,0 +1,116 @@
+       .ORIG x3000
+        AND R1, R1, #0      ; Clear R1 to use as a counter
+        ADD R1, R1, #8      
+        LD  R2, NEGZ
+LOOP1   LDI R3, KBSR
+        BRzp LOOP1          ; Loop until a key is pressed (KBSR bit [15] = 1)
+        LDI R0, KBDR        ; Load the key pressed from KBDR into R0
+        ADD R4, R0, R2      ; Add R2 (negation of 'Z') to character in R0
+        BRnz NEXT            ; If the result is negative, character is less than 'Z', go to NEXT
+
+LOOP2   LDI R5 DSR
+        BRzp LOOP2          ; Loop until the display is ready
+        STI R0, DDR         ; Store the character in R0 to DDR to display it
+
+NEXT    ADD R1, R1, #-1 
+        BRp LOOP1           ; If counter is not zero, repeat loop
+        HALT                ; Stop the program
+
+; Constants for device registers
+NEGZ    .FILL xFFA6     ; NEGZ = -'Z' (-90 in decimal)
+KBSR    .FILL xFE00     ; Keyboard status register address
+KBDR    .FILL xFE02     ; Keyboard data register address
+DSR     .FILL xFE04     ; Display status register address
+DDR     .FILL xFE06     ; Display data register address
+    .END
+
+
+
+
+
+        .ORIG x3000
+        AND R1, R1, #0      ; Clear R1 to use as a counter
+        ADD R1, R1, #8      ; Set counter to 8 (length of "coMpUTer")
+        LD  R2, NEGZ
+        LEA R6, INPUT       ; Load the address of the input string into R6
+
+LOOP1   LDR R0, R6, #0      ; Load the next character from the input string
+        ADD R6, R6, #1      ; Increment the address pointer
+        ADD R4, R0, R2      ; Add R2 (negation of 'Z') to character in R0
+        BRnz NEXT           ; If the result is negative, character is less than 'Z', go to NEXT
+
+LOOP2   LDI R5, DSR
+        BRzp LOOP2          ; Loop until the display is ready
+        STI R0, DDR         ; Store the character in R0 to DDR to display it
+
+NEXT    ADD R1, R1, #-1 
+        BRp LOOP1           ; If counter is not zero, repeat loop
+        HALT                ; Stop the program
+
+; Constants for device registers
+NEGZ    .FILL xFFA6     ; NEGZ = -'Z' (-90 in decimal)
+KBSR    .FILL xFE00     ; Keyboard status register address
+KBDR    .FILL xFE02     ; Keyboard data register address
+DSR     .FILL xFE04     ; Display status register address
+DDR     .FILL xFE06     ; Display data register address
+
+; Input string "coMpUTer"
+INPUT   .STRINGZ "coMpUTer"
+.END
+
+
+
+
+
+.ORIG x3000
+        AND R1, R1, #0      ; Clear R1 to use as a counter
+        ADD R1, R1, #8      ; Set counter to 8 (length of "coMpUTer")
+        LEA R6, INPUT       ; Load the address of the input string into R6
+        LD  R2, NEGZ
+
+LOOP1   LDR R0, R6, #0      ; Load the next character from the input string
+        ADD R6, R6, #1      ; Increment the address pointer
+        ADD R4, R0, R2      ; Add R2 (negation of 'Z') to character in R0
+        BRnz NEXT           ; If the result is negative, character is less than 'Z', go to NEXT
+
+LOOP2   LDI R5, DSR
+        BRzp LOOP2          ; Loop until the display is ready
+        STI R0, DDR         ; Store the character in R0 to DDR to display it
+
+NEXT    ADD R1, R1, #-1 
+        BRp LOOP1           ; If counter is not zero, repeat loop
+        HALT                ; Stop the program
+
+; Constants for device registers
+NEGZ    .FILL xFFA6     ; NEGZ = -'Z' (-90 in decimal)
+KBSR    .FILL xFE00     ; Keyboard status register address
+KBDR    .FILL xFE02     ; Keyboard data register address
+DSR     .FILL xFE04     ; Display status register address
+DDR     .FILL xFE06     ; Display data register address
+
+; Input string "coMpUTer"
+INPUT   .STRINGZ "coMpUTer"
+.END
+
+
+.ORIG	x3000
+	LD R0, DIG7                 ; Load into R0 Line
+	LD R1, NEG0                 ; Load into R1 Line
+LOOP	LDI R2, DSRaddr
+	BRzp	LOOP
+	STI R0, DDRaddr
+	ADD	R0, R0, #-1
+	ADD	R3, R0, R1
+	BRp LOOP
+	HALT
+DIG0	.FILL	x0030		; ASCII '0'
+DIG1	.FILL	x0031		; ASCII '1'
+DIG7	.FILL	x0037		; ASCII '7'
+DIG8	.FILL	x0038		; ASCII '8'
+NEG0	.FILL	xFFD0		; negation of ASCII '0'
+NEG1	.FILL	xFFCF		; negation of ASCII '1'
+NEG7	.FILL	xFFC9		; negation of ASCII '7'
+NEG8	.FILL	xFFC8		; negation of ASCII '8'
+DSRaddr	.FILL	xFE04
+DDRaddr	.FILL	xFE06
+	.END
